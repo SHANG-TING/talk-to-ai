@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog-deployment
+spec:
+  selector:
+    matchLabels:
+      app: neil-xie-ai
+  replicas: 2 
+  template:
+    metadata:
+      labels:
+        app: neil-xie-ai
+    spec:
+      containers:
+      - name: neil-xie-ai
+        image: ghcr.io/shang-ting/talktoai:{{ .Values.image.tag }}
+        ports:
+        - containerPort: 80
+        env: 
+        - name: OPEN_API_KEY
+          value: {{ .Values.env.OPEN_API_KEY }}
+        - name: SLACK_BOT_AUTH_TOKEN
+          value: {{ .Values.env.SLACK_BOT_AUTH_TOKEN }}        
+      imagePullSecrets:
+      - name: "{{ .Values.imagePullSecretName }}"

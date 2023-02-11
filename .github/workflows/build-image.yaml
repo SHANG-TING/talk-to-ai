@@ -1,0 +1,27 @@
+name: Build Application Image
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build_image:
+    name: Build Image And Push To GHCR
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: docker build -t ghcr.io/shang-ting/talktoai:${{ github.event.release.tag_name }} -t ghcr.io/shang-ting/talktoai:latest -f ./TalkToAI/Dockerfile ./
+    - name: Login ghcr
+      run: echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u shang-ting --password-stdin
+    - name: Push Image(version)
+      run: docker push ghcr.io/shang-ting/talktoai:${{ github.event.release.tag_name }}
+    - name: Push Image(latest)
+      run: docker push ghcr.io/shang-ting/talktoai:latest
+    - name: Trigger deploy service
+      uses: peter-evans/repository-dispatch@v2
+      with:
+        token: ${{ secrets.WORKFLOW_TOKEN }}
+        repository: SHANG-TING/talk-to-ai
+        event-type: build_image_successed
+        client-payload: '{ "tag_name":"${{ github.event.release.tag_name }}", "prerelease": "false" }'

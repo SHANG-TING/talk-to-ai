@@ -1,0 +1,30 @@
+name: Deploy To K8s by Helm
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version'
+        required: true
+      isPrerelease:
+        description: 'IsPrerelease'
+        required: true
+        default: 'false'
+  repository_dispatch:
+    types: [build_image_successed]
+
+jobs:
+  depoly:
+    name: 佈署服務
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Update depolyment yaml variables
+        run: |          
+          sed -i 's/\$Neil_Xie_AppVersion/${{ github.event.inputs.version || github.event.client_payload.tag_name }}/g' ./helm/values.yaml
+          sed -i 's/\$Neil_Xie_OPEN_API_KEY/${{ secrets.OPEN_API_KEY }}/g' ./helm/values.yaml          
+          sed -i "s/\$Neil_Xie_SLACK_BOT_AUTH_TOKEN/${{ secrets.SLACK_BOT_AUTH_TOKEN }}/g" ./helm/values.yaml           
+      - run: |
+          echo '${{ secrets.KUBE_CONFIG }}' | base64 --decode > .kubeconfig
+      - uses: azure/setup-helm@v3
+      - run: helm upgrade --install neil-xie-ai ./helm --create-namespace --namespace partner-neil-xie --kubeconfig .kubeconfig 

@@ -1,0 +1,13 @@
+replicaCount: 2
+image:
+  tag: '$Neil_Xie_AppVersion'
+
+imagePullSecretName: 'neil-xie-ghcr'
+
+env:
+  OPEN_API_KEY: '$Neil_Xie_OPEN_API_KEY'
+  SLACK_BOT_AUTH_TOKEN: '$Neil_Xie_SLACK_BOT_AUTH_TOKEN'
+
+ingress:
+  hosts:
+    - ai-neil-xie.edward-hsu.net
