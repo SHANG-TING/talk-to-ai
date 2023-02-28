@@ -28,6 +28,11 @@ public class SlackController : ControllerBase
     {
         string jsonString = json.ToString();
         var data = JsonSerializer.Deserialize<SlackEventDto>(jsonString);
+        
+        if (data?.challenge is not null)
+        {
+            return Ok(new { data.challenge });
+        }
 
         Task.Run(async () =>
         {

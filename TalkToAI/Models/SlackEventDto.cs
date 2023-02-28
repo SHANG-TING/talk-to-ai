@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace TalkToAI.Models;
 
 public class Authorization
@@ -51,4 +53,5 @@ public class SlackEventDto
     public List<Authorization> authorizations { get; set; }
     public bool is_ext_shared_channel { get; set; }
     public string event_context { get; set; }
+    public string challenge { get; set; }
 }
